@@ -9,12 +9,10 @@ namespace ConsoleApp
 {
     class bordGame
     {
-        static void Main(string[] args)
+        static Random randint = new Random();
+        static int i = randint.Next(1, 3);
+        static string[] map =
         {
-            Random randint = new Random();
-            int i = randint.Next(1, 2);
-            string[] map =
-            {
                 "출발",
                 "타이베이(대만)",
                 "황금열쇠",
@@ -57,7 +55,7 @@ namespace ConsoleApp
                 "서울(대한민국)"
 
             };
-            Dictionary<int, string> gold_key = new Dictionary<int, string>()
+        static Dictionary<int, string> gold_key = new Dictionary<int, string>()
             {
                 { 1, "병원비 지불" },
                 { 2, "복권 당첨" },
@@ -91,7 +89,7 @@ namespace ConsoleApp
                 { 30, "반액 대매출" },
 
             };
-            Dictionary<string, string> gold_key_discription = new Dictionary<string, string>()
+        static Dictionary<string, string> gold_key_discription = new Dictionary<string, string>()
             {
                 { "병원비 지불", "병원에서 건강진단을 받았습니다. - (병원비 5만 원을 은행에 납부합니다.)" },
                 { "복권 당첨", "축하합니다. 복권에 당첨되었습니다. - (당첨금 20만원을 은행에서 받습니다.)" },
@@ -118,20 +116,67 @@ namespace ConsoleApp
                 { "이사", "뒤로 두 칸 옮기세요." },
                 { "사회복지기금 배당", "사회복지기금 접수처로 가세요.- (출발지를 지나갈 경우, 월급을 받습니다.)" },
                 { "반액 대매출", "당신의 부동산 중에서 가장 비싼 곳을 반액으로 은행에 파세요. -(건물이 지어진 경우, 반액으로 함께 처분합니다.)" },
+            };
+        static string value;
+
+
+        static bool com_turn = false;
+        static bool usr_turn = false;
+
+        static int com_location = 0;
+        static int usr_location = 0;
+
+        static List<string> com_card = new List<string>();
+        static List<string> usr_card = new List<string>();
+
+        static List<string> com_rand_list = new List<string>();
+        static List<string> usr_rand_list = new List<string>();
+        static void buy_or_get_key(List<string> rand_list, List<string> card_list)
+        {
+            string rand = map[com_location];
+            if (rand != "황금열쇠")
+            {
+                rand_list.Add(rand);
             }
-            string value;
-
-
-            bool com_turn = false;
-            bool usr_turn = false;
-           
-            int com_location = 0;
-            int usr_location = 0;
-
-            string[] com_card = { };
-            string[] usr_card = { };
-
-            List<string> com_rand_list = new List<string>();
+            else
+            {
+                int key_num = randint.Next(1, 31);
+                bool havevalue = gold_key.TryGetValue(key_num, out value);
+                if (havevalue)
+                {
+                    Console.WriteLine($"뽑은 카드 : { value }");
+                    if (value == "관광 여행")
+                    {
+                        int choose_rand = randint.Next(1, 3);
+                        if (choose_rand == 1)
+                        {
+                            Console.WriteLine(gold_key_discription[value].Replace("{}", "서울"));
+                        }
+                        else
+                        {
+                            Console.WriteLine(gold_key_discription[value].Replace("{}", "부산"));
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine(gold_key_discription[value]);
+                    }
+                    card_list.Add(value);
+                }
+                if (String.Join(",", rand_list) == "")
+                {
+                    Console.WriteLine("보유 땅 없음");
+                }
+                else if (String.Join(",", rand_list) != "")
+                {
+                    Console.WriteLine($"보유 땅 : {String.Join(", ", rand_list)}");
+                }
+                //보유 땅 목록이 출력되지 않음 해결 필요
+            }
+        }
+        static void Main(string[] args)
+        {
+            
 
             Console.WriteLine("Black Marble");
             Console.WriteLine(i);
@@ -142,6 +187,10 @@ namespace ConsoleApp
             {
                 com_turn = true;
             }
+            else
+            {
+                usr_turn = true;
+            }
 
             if (com_turn == true)
             {
@@ -151,48 +200,11 @@ namespace ConsoleApp
                 Console.WriteLine($"도착 위치 : {map[com_location]}");
                 Console.WriteLine();
 
+                // 돈이 충분하면 사는 것으로 알고리즘 변경 필요
                 int com_buy = randint.Next(1, 2);
                 if (com_buy == 1)
                 {
-                    string rand = map[com_location];
-                    if (rand != "황금열쇠")
-                    {
-                        com_rand_list.Add(rand);
-                    }
-                    else
-                    {
-                        int key_num = randint.Next(1, 31);
-                        bool havevalue = gold_key.TryGetValue(key_num, out value);
-                        if (havevalue)
-                        {
-                            Console.WriteLine($"뽑은 카드 : { value }");
-                            if (value == "관광 여행")
-                            {
-                                int choose_rand = randint.Next(1, 3);
-                                if (choose_rand == 1)
-                                {
-                                    Console.WriteLine(gold_key_discription[value].Replace("{}", "서울"));
-                                }
-                                else
-                                {
-                                    Console.WriteLine(gold_key_discription[value].Replace("{}", "부산"));
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine(gold_key_discription[value]);
-                            }
-                        }
-                    }
-                    if (String.Join(",", com_rand_list) == "")
-                    {
-                        Console.WriteLine("보유 땅 없음");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"보유 땅 : {String.Join(", ", com_rand_list)}");
-                    }
-
+                    buy_or_get_key(com_rand_list, com_card);
                 }
             }
 
