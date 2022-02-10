@@ -131,6 +131,15 @@ namespace ConsoleApp
 
         static List<string> com_rand_list = new List<string>();
         static List<string> usr_rand_list = new List<string>();
+
+        static void throw_dice()
+        {
+            int dice = randint.Next(1, 7);
+            Console.WriteLine($"주사위 숫자 : {dice}");
+            com_location = com_location + dice;
+            Console.WriteLine($"도착 위치 : {map[com_location]}");
+            Console.WriteLine();
+        }
         static void buy_or_get_key(List<string> rand_list, List<string> card_list)
         {
             string rand = map[com_location];
@@ -167,11 +176,6 @@ namespace ConsoleApp
                 {
                     Console.WriteLine("보유 땅 없음");
                 }
-                else if (String.Join(",", rand_list) != "")
-                {
-                    Console.WriteLine($"보유 땅 : {String.Join(", ", rand_list)}");
-                }
-                //보유 땅 목록이 출력되지 않음 해결 필요
             }
         }
         static void Main(string[] args)
@@ -194,18 +198,19 @@ namespace ConsoleApp
 
             if (com_turn == true)
             {
-                int dice = randint.Next(1, 7);
-                Console.WriteLine($"주사위 숫자 : {dice}");
-                com_location = com_location + dice;
-                Console.WriteLine($"도착 위치 : {map[com_location]}");
-                Console.WriteLine();
+                throw_dice();
 
                 // 돈이 충분하면 사는 것으로 알고리즘 변경 필요
                 int com_buy = randint.Next(1, 2);
                 if (com_buy == 1)
                 {
                     buy_or_get_key(com_rand_list, com_card);
+                    Console.WriteLine($"보유 땅 : {String.Join(", ", com_rand_list)}");
                 }
+            }
+            else if (usr_turn == true)
+            {
+                throw_dice();
             }
 
 
